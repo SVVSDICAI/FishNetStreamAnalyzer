@@ -1,6 +1,7 @@
 # test script to parse screenshots captured from stream to determine which ones are worth uploading for further analysis
 
 import csv
+import json
 import tensorflow as tf
 from PIL import Image, ImageOps
 import numpy as np
@@ -14,7 +15,7 @@ import os
 from picamera import PiCamera
 
 # variable that determines if images are captured from screenshots, or the camera directly
-image_capture = "CAMERA" # set to "SCREENSHOT" to take screenshots
+image_capture = "SCREENSHOT" # set to "SCREENSHOT" to take screenshots
 
 if (image_capture == "CAMERA"):
     camera = PiCamera()
@@ -30,7 +31,7 @@ np.set_printoptions(suppress=True)
 
 # load the model
 print("loading model...")
-model = tf.keras.models.load_model("/home/pi/Desktop/stream_capture/keras_model.h5")
+model = tf.keras.models.load_model("/home/pi/Desktop/FishLadderStreamAnalyzer/keras_model.h5")
 print("model loaded!")
 
 
@@ -86,7 +87,7 @@ def run_model(up_image):
 
     # checking uf the program is more then 50% sure
     if (float(max_value) > float(0.5)):
-        print("face detected!")
+        print("fish detected!")
 
         # print a newline
         print("")
@@ -104,15 +105,15 @@ def run_model(up_image):
         # adding a list to put in the csv
         changes = [[res_str, uploaded_image.link, datetime.now(), "1"]] # new row, including the model's confidence in its decision, link to the image, timestamp, and a blank column that we will use to count the number of fish at some point
 
-        # opening the data csv in append mode
-        with open(r'./FishLadderStreamCapture/convertcsv.csv',"a") as f:                 
+        # opening the data json in append mode
+        with open(r"./FishLadderStreamCapture/convertcsv.csv","a") as f:                 
             #initalizing the csv writer                   
             writer = csv.writer(f) # writing the new row from the changes list                                        
             writer.writerows(changes)
             f.close()
 
             # update the graph
-            csv_file = csv.reader(open('./FishLadderStreamCapture/convertcsv.csv'))
+            csv_file = csv.reader(open("./FishLadderStreamCapture/convertcsv.csv"))
 
             times = []
 
@@ -130,7 +131,13 @@ def run_model(up_image):
                 else:
                     frequencies[date] += 1
                 
-            print(frequencies.keys())
+            #print(frequencies.keys())
+                    
+            # update the json file with the count data (used by the graph generated on the website)
+            j = {"lables": list(frequencies.keys()), "data": list(frequencies.values())}
+            jsn = open(r"./FishLadderStreamCapture/convertjson.txt", "w") # write changes to json
+            json.dump(j, jsn)
+            jsn.close()
 
             ax = plt.subplot(111)
             plt.xticks(rotation=90)
