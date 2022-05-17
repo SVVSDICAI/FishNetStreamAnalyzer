@@ -59,8 +59,8 @@ def run_model(up_image):
 
     # run the inference
     print("running model...")
-    prediction = model.predict(data)
-    #print("ran model: " + str(prediction))
+    prediction = model.__call__(data)
+    print("ran model: " + str(prediction))
     
     # printing the confidence values
     # turning the numpy data array into a list
