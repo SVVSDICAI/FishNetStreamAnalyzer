@@ -13,11 +13,12 @@ if sys.argv[0] == "init": # if this file is run from the terminal (python RepoUp
     # github login info
     username = "cogrpar"
     # read github password
-    key = open(GITHUB_KEY, 'r')
-    password = key.read()
-    key.close()
+    with open(GITHUB_KEY, 'r') as key:
+    	password = key.read()
+    	key.close()
     remote = f"https://{username}:{password}@github.com/cogrpar/FishLadderStreamCapture.git"
-
+    remote = remote.replace("\n", "")
+    print(remote)
     Repo.clone_from(remote, PATH_OF_GIT_REPO) # This must be run initially to ensure that the github login info is set
 
 def git_push(): # function to push the updates to github
