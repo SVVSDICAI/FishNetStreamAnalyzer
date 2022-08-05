@@ -14,9 +14,14 @@ print("making logs directory...")
 make_logs = subprocess.run(["mkdir", "logs"])
 print("The exit code was: %d" % make_logs.returncode)
 
-commands = ["@reboot sh "+cwd+"/watchdog.sh >"+cwd+"/logs/cronlog 2>&1"]
+commands = ["@reboot sh "+cwd+"/watchdog.sh >"+cwd+"/logs/cronlog 2>&1", "sh "+cwd+"/watchdog.sh >"+cwd+"/logs/cronlog 2>&1"]
 print("adding to crontab...")
-cron = CronTab(user="root")  # root users cron
+cron = CronTab(user="pi")  # root users cron
 for cmd in commands:
-    job = cron.new(command=cmd)
-    cron.write()
+    if ("@reboot" in cmd):
+        job = cron.new(command=cmd.replace("@reboot ", ""))
+        job.every_reboot()
+    else:
+        job = cron.new(command=cmd)
+        job.minute.every(10)
+cron.write()
