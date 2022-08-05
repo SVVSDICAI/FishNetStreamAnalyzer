@@ -1,6 +1,8 @@
 # test script to parse screenshots captured from stream to determine which ones are worth uploading for further analysis
 
 import csv
+import pafy
+import cv2
 import json
 import tensorflow as tf
 from PIL import Image, ImageFile, ImageOps
@@ -12,6 +14,11 @@ import RepoUpdate
 from datetime import datetime
 import matplotlib.pyplot as plt
 import os
+
+# set up pafy to capture images from the youtube stream
+url = '[put youtube url here]'
+video = pafy.new(url)
+best = video.getbest(preftype="mp4")
 
 ImageFile.LOAD_TRUNCATED_IMAGES=True
 
@@ -193,11 +200,13 @@ def run_model(up_image):
             RepoUpdate.git_push()
 
 try:
+    capture = cv2.VideoCapture(best.url)
     while True:
-        if os.path.exists("screenshot.png"):
-            os.remove("screenshot.png")
+        grabbed, frame = capture.read()
+        #if os.path.exists("screenshot.png"):
+        #    os.remove("screenshot.png")
 
-        im = pyautogui.screenshot("screenshot.png")
-        run_model(Image.open("screenshot.png"))
+        #im = pyautogui.screenshot("screenshot.png")
+        run_model(frame)
 except KeyboardInterrupt:
     pass
