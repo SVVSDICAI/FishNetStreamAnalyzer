@@ -1,5 +1,5 @@
 # git hub repo writer
-# repo at https://github.com/cogrpar/FishLadderStreamCapture.git
+# repo at https://github.com/SVVSDICAI/FishNetStreamCapture
 from git import Repo
 import sys
 
@@ -16,7 +16,7 @@ if sys.argv[0] == "init": # if this file is run from the terminal (python RepoUp
     with open(GITHUB_KEY, 'r') as key:
     	password = key.read()
     	key.close()
-    remote = f"https://{username}:{password}@github.com/cogrpar/FishLadderStreamCapture.git"
+    remote = f"https://{username}:{password}@github.com/SVVSDICAI/FishNetStreamCapture.git"
     remote = remote.replace("\n", "")
     print(remote)
     Repo.clone_from(remote, PATH_OF_GIT_REPO) # This must be run initially to ensure that the github login info is set
