@@ -31,11 +31,14 @@ CLIENT_ID = "***REMOVED***"
 # disable scientific notation for clarity
 np.set_printoptions(suppress=True)
 
-# load the model
-print("loading model...")
-model = tf.keras.models.load_model("./model/keras_model.h5")
-print("model loaded!")
+# load the models
+print("loading unary model...")
+unary_model = tf.keras.models.load_model("./models/unary_classifier/keras_model.h5")
+print("unary model loaded!")
 
+print("loading species classifier model...")
+species_model = tf.keras.models.load_model("./models/species_classifier/keras_model.h5")
+print("species classifier model loaded!")
 
 # create the array of the right shape to feed into the keras model
 # the 'length' or number of images you can put into the array is
@@ -65,9 +68,9 @@ def run_model(up_image):
     data[0] = normalized_image_array
 
     # run the inference
-    print("running model...")
-    prediction = model.__call__(data)
-    print("ran model: " + str(prediction))
+    print("running unary model...")
+    prediction = unary_model.__call__(data)
+    print("ran unary_model: " + str(prediction))
     
     # printing the confidence values
     # turning the numpy data array into a list
