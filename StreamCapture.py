@@ -203,13 +203,18 @@ def run_model(up_image):
             RepoUpdate.git_push()
 
 try:
-    capture = cv2.VideoCapture(best.url)
     while True:
+        capture = cv2.VideoCapture(best.url)
         grabbed, frame = capture.read()
+        # convert frame to image (find better way to do this, currently very inefficient)
+        for i in range(frame.shape[0]):
+            for j in range(frame.shape[1]):
+                frame[i, j] = [frame[i,j,2],frame[i,j,1],frame[i,j,0]]
+        img = Image.fromarray(frame)
         #if os.path.exists("screenshot.png"):
         #    os.remove("screenshot.png")
 
         #im = pyautogui.screenshot("screenshot.png")
-        run_model(frame)
+        run_model(img)
 except KeyboardInterrupt:
     pass
