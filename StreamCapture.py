@@ -26,7 +26,7 @@ ImageFile.LOAD_TRUNCATED_IMAGES=True
 outputs = ["fish", "no_fish"]
 
 # imgur client id
-CLIENT_ID = "***REMOVED***"
+CLIENT_ID = "8592d136b96e6c6"
 
 # disable scientific notation for clarity
 np.set_printoptions(suppress=True)
