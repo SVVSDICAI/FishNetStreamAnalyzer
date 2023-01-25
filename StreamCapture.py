@@ -24,9 +24,10 @@ ImageFile.LOAD_TRUNCATED_IMAGES=True
 
 # An ordered list of the different possible outputs of the model in the order that they appear in the output array
 outputs = ["fish", "no_fish"]
+species_classes = ["White Sucker", "Black Bullhead Catfish", "Plains Topminnow", "Brown Trout", "Creek Chub"]
 
 # imgur client id
-CLIENT_ID = "8592d136b96e6c6"
+CLIENT_ID = os.getenv("IMGUR_CLIENT_ID") # TODO set this on the device running this script
 
 # disable scientific notation for clarity
 np.set_printoptions(suppress=True)
