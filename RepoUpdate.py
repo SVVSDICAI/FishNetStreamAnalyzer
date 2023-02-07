@@ -8,7 +8,7 @@ COMMIT_MESSAGE = "automated update"
 
 GITHUB_KEY = r'/github_key'
 
-if sys.argv[0] == "init": # if this file is run from the terminal (python RepoUpdate.py init) to initialize the github login info and clone the repo to the current directory
+if len(sys.argv) > 1 and sys.argv[1] == "init": # if this file is run from the terminal (python RepoUpdate.py init) to initialize the github login info and clone the repo to the current directory
     print("cloning repo")
     # github login info
     username = "cogrpar"
