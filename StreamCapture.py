@@ -1,14 +1,13 @@
 # test script to parse screenshots captured from stream to determine which ones are worth uploading for further analysis
 
 import csv
-import pafy
 import cv2
 import json
 import tensorflow as tf
 from PIL import Image, ImageFile, ImageOps
 import numpy as np
 import pyimgur
-import pyautogui
+from colorama import Fore, Style
 from time import sleep
 import RepoUpdate
 from datetime import datetime
@@ -16,6 +15,8 @@ import matplotlib.pyplot as plt
 import os
 
 ImageFile.LOAD_TRUNCATED_IMAGES=True
+
+SHOW_PREDICTION_IMGS = True # this boolean determines if the script will display the model's predictions as images
 
 # An ordered list of the different possible outputs of the model in the order that they appear in the output array
 outputs = ["fish", "no_fish"]
@@ -80,8 +81,9 @@ def run_model(up_image):
     # checking if the program is more then 50% sure
     if (prediction[0][0] > float(0.5)):
         print("fish detected!")
-        cv2.imshow("F  I  S  H  !  !  !", image_array)
-        cv2.waitKey(1)
+        if SHOW_PREDICTION_IMGS:
+          cv2.imshow("F  I  S  H  !  !  !", image_array)
+          cv2.waitKey(1)
 
         # check to see if this is a new fish
         if not fish_prev_frame:
@@ -103,8 +105,8 @@ def run_model(up_image):
                     predicted_fish = [fish_type, species[fish_type]]
                 n += 1
 
-            print("predicted species: " + predicted_fish[0])
-
+            print(Fore.GREEN + "predicted species: " + predicted_fish[0])
+            print(Style.RESET_ALL)
 
             # setting a variable to represent the path to the image
             PATH = "fish.png"
@@ -217,9 +219,10 @@ def run_model(up_image):
 
     else:
         # no fish
-        fish_prev_frame = False
-        cv2.imshow("NOOO F  I  S  H  !  !  !", image_array)
-        cv2.waitKey(1)
+        if SHOW_PREDICTION_IMGS:  
+          fish_prev_frame = False
+          cv2.imshow("NOOO F  I  S  H  !  !  !", image_array)
+          cv2.waitKey(1)
 
 
 

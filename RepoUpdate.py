@@ -1,22 +1,19 @@
 # git hub repo writer
 # repo at https://github.com/SVVSDICAI/FishNetStreamCapture
+import os
 from git import Repo
 import sys
 
 PATH_OF_GIT_REPO = r'./FishLadderStreamCapture'
 COMMIT_MESSAGE = "automated update"
 
-GITHUB_KEY = r'/github_key'
+GITHUB_KEY = os.getenv('GITHUB_KEY')
 
 if len(sys.argv) > 1 and sys.argv[1] == "init": # if this file is run from the terminal (python RepoUpdate.py init) to initialize the github login info and clone the repo to the current directory
     print("cloning repo")
     # github login info
-    username = "cogrpar"
-    # read github password
-    with open(GITHUB_KEY, 'r') as key:
-    	password = key.read()
-    	key.close()
-    remote = f"https://{username}:{password}@github.com/SVVSDICAI/FishNetStreamCapture.git"
+    username = "automated"
+    remote = f"https://{username}:{GITHUB_KEY}@github.com/SVVSDICAI/FishNetStreamCapture.git"
     remote = remote.replace("\n", "")
     print(remote)
     Repo.clone_from(remote, PATH_OF_GIT_REPO) # This must be run initially to ensure that the github login info is set

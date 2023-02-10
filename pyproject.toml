@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "repl_nix_FishNetStreamAnalyzer"
+version = "0.1.0"
+description = ""
+authors = ["Replit user <<>>"]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+GitPython = "^3.1.30"
+
+tensorflow = "^2.2.0rc1"
+keras = "^2.3"
+pandas = "^1.0.3"
+numpy = "^1.18.2"
+sklearn = "^0.0"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
