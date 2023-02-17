@@ -121,7 +121,7 @@ def run_model(up_image):
             #print(uploaded_image.link)
 
             # adding a list to put in the csv
-            changes = [[res_str, uploaded_image.link, datetime.now(), "1"]] # new row, including the model's confidence in its decision, link to the image, timestamp, and a blank column that we will use to count the number of fish at some point
+            changes = [[predicted_fish[0], uploaded_image.link, datetime.now(), "1"]] # new row, including the model's confidence in its decision, link to the image, timestamp, and a blank column that we will use to count the number of fish at some point
 
             # opening the data json in append mode
             with open(r"./FishLadderStreamCapture/convertcsv.csv","a") as f:                 
@@ -228,7 +228,7 @@ def run_model(up_image):
 
 try:
     # iterate over each frame in the video file captured locally on the camera pi
-    video = './clips/clip20_cropped.mp4'
+    video = './clips/local_species.mp4'
     cap = cv2.VideoCapture(video)
 
     # iterate over the frames
