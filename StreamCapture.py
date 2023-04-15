@@ -30,6 +30,8 @@ np.set_printoptions(suppress=True)
 
 # load the models
 print("loading unary model...")
+# the unary model is the primary model that determines if there is a fish in the image or not
+# it is called unary because in effect it just counts up the number of frames with fish
 unary_model = tf.keras.models.load_model("./models/unary_classifier/keras_model.h5")
 print("unary model loaded!")
 
@@ -46,6 +48,8 @@ data = np.ndarray(shape=(1, 224, 224, 3), dtype=np.float32)
 # we want to avoid counting the same fish multiple times, so only increment the counter if there were no fish in the previous frame
 # boolean to keep track of if there was any fish in the previous frame
 fish_prev_frame = False
+
+clip_date = ''
 
 def run_model(up_image):
     global fish_prev_frame
@@ -121,7 +125,8 @@ def run_model(up_image):
             #print(uploaded_image.link)
 
             # adding a list to put in the csv
-            changes = [[predicted_fish[0], uploaded_image.link, datetime.now(), "1"]] # new row, including the model's confidence in its decision, link to the image, timestamp, and a blank column that we will use to count the number of fish at some point
+            fish_date = clip_date if clip_date != '' else datetime.now()
+            changes = [[predicted_fish[0], uploaded_image.link, fish_date, "1"]] # new row, including the model's confidence in its decision, link to the image, timestamp, and a blank column that we will use to count the number of fish at some point
 
             # opening the data json in append mode
             with open(r"./FishLadderStreamCapture/convertcsv.csv","a") as f:                 
@@ -225,27 +230,28 @@ def run_model(up_image):
           cv2.waitKey(1)
 
 
-
 try:
     # iterate over each frame in the video file captured locally on the camera pi
-    video = './clips/local_species.mp4'
-    cap = cv2.VideoCapture(video)
+    for clip in sorted(os.listdir('./clips/Deployment1')):
+        video = './clips/Deployment1/' + clip
+        cap = cv2.VideoCapture(video)
+        clip_date = clip.split('_')[1].split('.')[0] # just get the date from file name of the form clipN_[date].h264
 
-    # iterate over the frames
-    while cap.isOpened():
-        # read the current frame
-        ret, frame = cap.read()
+        # iterate over the frames
+        while cap.isOpened():
+            # read the current frame
+            ret, frame = cap.read()
 
-        if not ret:
-            break
+            if not ret:
+                break
 
-        frame_image = Image.fromarray(frame)
-        frame_image.save('fish.png')
-        # rotate the image
-        #frame_image = frame_image.rotate(90)
-        run_model(frame_image)
+            frame_image = Image.fromarray(frame)
+            frame_image.convert('RGB').save('fish.png')
+            # rotate the image
+            #frame_image = frame_image.rotate(90)
+            run_model(frame_image)
 
-    # release the video capture object
-    cap.release()
+        # release the video capture object
+        cap.release()
 except KeyboardInterrupt:
     print('exiting...')
