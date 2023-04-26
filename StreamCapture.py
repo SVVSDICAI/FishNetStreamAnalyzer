@@ -230,47 +230,48 @@ def run_model(up_image):
           cv2.waitKey(1)
 
 
-try:
-    # iterate over each frame in the video file captured locally on the camera pi
-    for clip in sorted(os.listdir('./clips/Deployment1')):
-        video = './clips/Deployment1/' + clip
-        cap = cv2.VideoCapture(video)
-        clip_date = clip.split('_')[1].split('.')[0] # just get the date from file name of the form clipN_[date].h264
+if __name__ == '__main__':
+    analysis = 'local_video' # set to 'live_stream' to analyze live stream
 
-        # iterate over the frames
-        while cap.isOpened():
-            # read the current frame
-            ret, frame = cap.read()
+    try:
+        if analysis == 'local_video':
+            # iterate over each frame in the video file captured locally on the camera pi
+            for clip in sorted(os.listdir('./clips/Deployment')):
+                video = './clips/Deployment/' + clip
+                cap = cv2.VideoCapture(video)
+                clip_date = clip.split('_')[1].split('.')[0] # just get the date from file name of the form clipN_[date].h264
 
-            if not ret:
-                break
+                # iterate over the frames
+                while cap.isOpened():
+                    # read the current frame
+                    ret, frame = cap.read()
 
-            frame_image = Image.fromarray(frame)
-            frame_image.convert('RGB').save('fish.png')
-            # rotate the image
-            #frame_image = frame_image.rotate(90)
-            run_model(frame_image)
+                    if not ret:
+                        break
 
-        # release the video capture object
-        cap.release()
-except KeyboardInterrupt:
-    print('exiting...')
+                    frame_image = Image.fromarray(frame)
+                    frame_image.convert('RGB').save('fish.png')
+                    # rotate the image
+                    #frame_image = frame_image.rotate(90)
+                    run_model(frame_image)
 
-''' 
-# The following is an example of how the above backend could be used to monitor a live stream running off of the camera Pi
+                # release the video capture object
+                cap.release()
 
-import pafy
+        elif analysis == 'live_stream':
+            # The following is an example of how the above backend could be used to monitor a live stream running off of the camera Pi
+            import pafy
 
-# set up pafy to capture images from the youtube stream
-url = '[put youtube url here]'
-video = pafy.new(url)
-best = video.getbest(preftype="mp4")
+            # set up pafy to capture images from the youtube stream
+            url = '[put youtube url here]'
+            video = pafy.new(url)
+            best = video.getbest(preftype="mp4")
 
-try:
-    capture = cv2.VideoCapture(best.url)
-    while True:
-        grabbed, frame = capture.read() # get the latest frame from the live stream
-        run_model(frame)
-except KeyboardInterrupt:
-    pass
-'''
+            try:
+                capture = cv2.VideoCapture(best.url)
+                while True:
+                    grabbed, frame = capture.read() # get the latest frame from the live stream
+                    run_model(frame)
+
+    except KeyboardInterrupt:
+        print('exiting...')

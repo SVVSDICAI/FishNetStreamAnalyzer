@@ -1,4 +1,0 @@
-1. Get the repo update script to write to the icai repo (NEVERMIND Repo got taken down for some reason)
-TODO: setup timestamp db on this pi, and have it write to that instead of github like a normal person
-2. Change the model to output json (DONE)
-3. Get the program to run on boot along with bringin up the stream to take screenshots (have it ping twitch first to make sure that it can be reached)
