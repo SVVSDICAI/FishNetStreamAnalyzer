@@ -255,3 +255,22 @@ try:
         cap.release()
 except KeyboardInterrupt:
     print('exiting...')
+
+''' 
+# The following is an example of how the above backend could be used to monitor a live stream running off of the camera Pi
+
+import pafy
+
+# set up pafy to capture images from the youtube stream
+url = '[put youtube url here]'
+video = pafy.new(url)
+best = video.getbest(preftype="mp4")
+
+try:
+    capture = cv2.VideoCapture(best.url)
+    while True:
+        grabbed, frame = capture.read() # get the latest frame from the live stream
+        run_model(frame)
+except KeyboardInterrupt:
+    pass
+'''
