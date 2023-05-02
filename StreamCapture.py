@@ -267,11 +267,10 @@ if __name__ == '__main__':
             video = pafy.new(url)
             best = video.getbest(preftype="mp4")
 
-            try:
-                capture = cv2.VideoCapture(best.url)
-                while True:
-                    grabbed, frame = capture.read() # get the latest frame from the live stream
-                    run_model(frame)
+            capture = cv2.VideoCapture(best.url)
+            while True:
+                grabbed, frame = capture.read() # get the latest frame from the live stream
+                run_model(frame)
 
     except KeyboardInterrupt:
         print('exiting...')
