@@ -211,10 +211,10 @@ def run_model(up_image):
                 ttl.set_weight('bold')
 
                 try: # delete the file if it exists
-                    os.remove("./FishLadderStreamCapture/graph.png")
+                    os.remove("./FishNetStreamCapture/graph.png")
                 except:
                     pass
-                plt.savefig("./FishLadderStreamCapture/graph.png")
+                plt.savefig("./FishNetStreamCapture/graph.png")
                 ax.clear()
 
                 # push the updated repo containing the csv and graph to github
