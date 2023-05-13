@@ -129,14 +129,14 @@ def run_model(up_image):
             changes = [[predicted_fish[0], uploaded_image.link, fish_date, "1"]] # new row, including the model's confidence in its decision, link to the image, timestamp, and a blank column that we will use to count the number of fish at some point
 
             # opening the data json in append mode
-            with open(r"./FishLadderStreamCapture/convertcsv.csv","a") as f:                 
+            with open(r"./FishNetStreamCapture/convertcsv.csv","a") as f:                 
                 #initalizing the csv writer                   
                 writer = csv.writer(f) # writing the new row from the changes list                                        
                 writer.writerows(changes)
                 f.close()
 
                 # update the graph
-                csv_file = csv.reader(open("./FishLadderStreamCapture/convertcsv.csv"))
+                csv_file = csv.reader(open("./FishNetStreamCapture/convertcsv.csv"))
 
                 times = []
 
@@ -158,7 +158,7 @@ def run_model(up_image):
                     
                 # update the json file with the count data (used by the graph generated on the website)
                 j = {"lables": list(frequencies.keys()), "data": list(frequencies.values())}
-                jsn = open(r"./FishLadderStreamCapture/convertjson.txt", "w") # write changes to json
+                jsn = open(r"./FishNetStreamCapture/convertjson.txt", "w") # write changes to json
                 json.dump(j, jsn)
                 jsn.close()
 
@@ -260,17 +260,71 @@ if __name__ == '__main__':
 
         elif analysis == 'live_stream':
             # The following is an example of how the above backend could be used to monitor a live stream running off of the camera Pi
-            import pafy
+            import multiprocessing
+            import yt_dlp
 
-            # set up pafy to capture images from the youtube stream
-            url = '[put youtube url here]'
-            video = pafy.new(url)
-            best = video.getbest(preftype="mp4")
+            # define a function that downloads frames from the live stream on a separate thread
+            def start_download(url, ydl_opts):
+                print('starting download')
+                yt_dlp.YoutubeDL(ydl_opts).download([url])
+                print('ending download')
+                
 
-            capture = cv2.VideoCapture(best.url)
+            # set up vidgear to capture images from the youtube stream
+            url = 'https://www.youtube.com/watch?v=lXzSU7ezjp8'
+
+            # define the options for downloading the video
+            ydl_opts = {
+                'format': 'best[ext=mp4]',
+                'quiet': True,
+                'no_warnings': True,
+                'outtmpl': './clips/live.mp4'
+            }
+
+            # remove previous downloads
+            if os.path.exists('./clips/live.mp4.part'):
+                os.remove('./clips/live.mp4.part')
+            if os.path.exists('./clips/live.mp4'):
+                os.remove('./clips/live.mp4')
+            if os.path.exists('./clips/saved.mp4'):
+                os.remove('./clips/saved.mp4')
+
+            # start the download process
+            download_proc = multiprocessing.Process(target=start_download, args=(url, ydl_opts,))
+            download_proc.start()
+
+            # start with 2 seconds of video to run the model on
+            while not os.path.exists('./clips/live.mp4.part'):
+                pass
+            time.sleep(2)
+            shutil.copyfile('./clips/live.mp4.part', './clips/saved.mp4')
+
+            StreamCapture.SHOW_PREDICTION_IMGS = False
+
+            # try running FishNET!
+            # open the downloaded video using OpenCV
+            last_frame = 1
+            cap = cv2.VideoCapture('./clips/saved.mp4')
+            cap.set(cv2.CAP_PROP_POS_FRAMES, last_frame)
+
             while True:
-                grabbed, frame = capture.read() # get the latest frame from the live stream
-                run_model(frame)
+                # read from the downloaded portion of the live stream
+                ret, frame = cap.read() # get the latest frame from the live stream
+
+                # if there are no more frames, copy the contents of live.mp4 to saved.mp4
+                if not ret:
+                    shutil.copyfile('./clips/live.mp4.part', './clips/saved.mp4')
+
+                    # reopen the file with cv2 making sure to resume at the last frame
+                    last_frame = int(cap.get(cv2.CAP_PROP_POS_FRAMES))
+                    cap = cv2.VideoCapture('./clips/saved.mp4')
+                    cap.set(cv2.CAP_PROP_POS_FRAMES, last_frame)
+                    continue
+
+                frame_image = Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
+                frame_image.convert('RGB').save('fish.png')
+                StreamCapture.run_model(frame_image)
 
     except KeyboardInterrupt:
+        cap.release()
         print('exiting...')
